@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<title>ROC, PR, and Region of Utility</title>
+
+<!--<link rel="stylesheet" type="text/css" href="style.css">-->
+<script type="text/javascript" src="canvas.js" async></script><!--canvas.js = the real one; canvas_quick.js = testing environment for image upload; ../test/diamond.js or ../test/dothighlight.js = testing environment-->
+<style>
+body {
+	position: relative;
+	width: 1200px;
+	background-color:#fafafa;
+	margin: 0;
+	overflow-x: hidden;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 9pt;
+}
+noscript{
+/*ref: centering things https://www.w3.org/Style/Examples/007/center.en.html*/
+	display:flex;
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	align-items: center;
+	justify-content: center;
+	background-color:#ccc;
+	border-radius: 20px;
+	font-size: 20pt;
+}
+canvas{
+	float:right;
+/*changing the width & height here will stretch or shrink the drawings on canvas .*/
+/*not declaring width or height = default to document.querySelector('canvas').width and document.querySelector('canvas').height as declared in .js file.*/
+	/*width:600px;*/
+	/*height:150px;*/
+	margin-left: 1em;
+	/*border: 2px dotted blue;*/
+}
+div#inputs{
+	margin-left:1em;
+}
+label{
+	display:inline-block;
+	width: 40ex;
+}
+div[id^='d']:hover{
+	background-color:#ccc;
+}
+input[type=text]{
+	text-align:right;
+	width: 6ex;
+	/*border-style:solid;*/
+}
+input[disabled]{
+	border-style: solid;
+	border-color: #fafafa;
+	background:none;
+}
+textarea#ROC_text{
+	float:right;
+	height:80px;
+	width:80px;
+	resize:vertical;
+}
+h1{
+	font-size: 14pt;
+	margin: 0.5em 0em;
+}
+h2{
+	font-size: 12pt;
+	margin: 0.5em 0em;
+}
+</style>
+</head>
+
+<body onload="Input2Label()">
+<noscript>Please turn on JavaScript and reload.</noscript>
+<canvas></canvas>
+<h1>Statistic Region of Utility visualized</h1>
+<div id="inputs">
+<p>
+Touch lines to highlight the variables they are based on.</p>
+<h2>Editable variables</h2>
+<p>Touch to highlight derived variable(s) affected by it.</p>
+<div id="dPrev" onmouseover="HighlightLabelnInput(['OR_pre', 'LR_pos_min', 'LR_neg_max'])" onmouseout="unHighlightLabelnInput(['OR_pre', 'LR_pos_min', 'LR_neg_max'])">
+<label for="Prev" >estimated prevalence (Prev):</label>
+<input type="text" id="Prev" value="0.6"/>
+</div>
+<div>
+<label for="Sens_min">minimal acceptable sensitivity:</label>
+<input type="text" id="Sens_min" value="0.7"/><!--style="border-color:#960" -->
+<input type="checkbox" id="showhide_Sens_min" value="1" checked/>impose limit
+</div>
+<div id="dPPV_min" onmouseover="HighlightLabelnInput(['LR_pos_min', 'OR_post_pos'])" onmouseout="unHighlightLabelnInput(['LR_pos_min', 'OR_post_pos'])">
+<label for="PPV_min" >minimal acceptable PPV:</label>
+<input type="text" id="PPV_min" value="0.75"/>
+<input type="checkbox" id="showhide_PPV_min" value="1" checked />impose limit
+</div>
+<div id="dNPV_min" onmouseover="HighlightLabelnInput(['LR_neg_max', 'OR_post_neg'])" onmouseout="unHighlightLabelnInput(['LR_neg_max', 'OR_post_neg'])">
+<label for="NPV_min">minimal acceptable NPV:</label>
+<input type="text" id="NPV_min" value="0.65"/>
+<input type="checkbox" id="showhide_FNvTN" value="1" />impose limit
+</div>
+<br/>
+<div style="height:100px; width: 340px">
+<textarea id="ROC_text">
+t1 0.4 0.95
+t2 0.6 0.92
+t3 0.7 0.9
+t4 0.8 0.8
+t5 0.9 0.5</textarea><label for="ROC_text" title="comma, space, or tab-delimited">ROC curve - threshold, Sens, Spec:</label><br/>
+<input type="checkbox" id="showhide_thresh" value="1"/>show threshold label next to dots
+</div>
+<h2>Derived variables</h2>
+<p>Touch to highlight which editable variable(s) affect it.</p>
+<div id="dOR_pre" onmouseover="HighlightLabelnInput(['Prev'])" onmouseout="unHighlightLabelnInput(['Prev'])">
+<label for="OR_pre">estimated pretest Odds Ratio (OR_pre):</label>
+<input type="text" id="OR_pre" value="" disabled/>
+<span class="eqn">= Prev/(1-Prev)</span>
+</div>
+<div id="dLR_pos_min" onmouseover="HighlightLabelnInput(['OR_pre', 'PPV_min', 'Prev'])" onmouseout="unHighlightLabelnInput(['OR_pre', 'PPV_min', 'Prev'])">
+<label for="LR_pos_min">minimal acceptable Likelihood Ratio (+):</label>
+<input type="text" id="LR_pos_min" value="" disabled/>
+<span class="eqn">= PPV/(1-PPV)/OR_pre</span>
+</div>
+<div id="dLR_neg_max" onmouseover="HighlightLabelnInput(['OR_pre', 'NPV_min', 'Prev'])" onmouseout="unHighlightLabelnInput(['OR_pre', 'NPV_min', 'Prev'])">
+<label for="LR_neg_max">maximal acceptable Likelihood Ratio (-):</label>
+<input type="text" id="LR_neg_max" value="" disabled/>
+<span class="eqn">= (1-NPV)/NPV/OR_pre</span>
+</div>
+<div id="dOR_post_pos" onmouseover="HighlightLabelnInput(['PPV_min'])" onmouseout="unHighlightLabelnInput(['PPV_min'])">
+<label for="OR_post_pos">minimal acceptable posttest Odds Ratio (+):</label>
+<input type="text" id="OR_post_pos" value="" disabled/>
+<span class="eqn">= PPV/(1-PPV)</span>
+</div>
+<div id="dOR_post_neg" onmouseover="HighlightLabelnInput(['NPV_min'])" onmouseout="unHighlightLabelnInput(['NPV_min'])">
+<label for="OR_post_neg">maximal acceptable posttest Odds Ratio (-):</label>
+<input type="text" id="OR_post_neg" value="" disabled/>
+<span class="eqn">= (1-NPV)/NPV</span>
+</div>
+<h2>Legend</h2>
+<p style="font-size:7pt">ROC, receiver-operative characteristic; PRC, precision-recall curve; TP, true positive; FP, false positive; FN, false negative; TN, true negative; Sens, sensitivity; Spec, specificity; Prev, prevalence; PPV, positive predictive value; NPV, negative predictive value; OR, odds ratio; LR+, likelihood ratio positive; LR-, likelihood ratio negative</p>
+</div>
+<p id="debug"></p>
+</body>
+</html>

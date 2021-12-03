@@ -16,7 +16,7 @@ and NPV. For a test to be useful, its curve must fall within this <i>region of
 utility</i>. Only then can one choose the best test threshold from within this
 region – i.e. the point on the ROC curve closest to the top left corner. We
 present a web-based interactive visual representation (<a
-href="https://reirisono.github.io/ROC_PRC_visualizer/">https://reirisono.github.io/ROC_PRC_visualizer/</a>
+href="https://reirisono.github.io/ROC_PRC_visualizer/visualizer.html">https://reirisono.github.io/ROC_PRC_visualizer/visualizer.html</a>
 as of 20211102) with its derivation explained below.</p>
 
 <h1>Supplementary Document: ROC curve interpretation 20191025 Reiri Sono</h1>

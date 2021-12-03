@@ -3046,6 +3046,7 @@ ZH-TW;mso-bidi-language:AR-SA'><!--[if gte vml 1]><v:shape id="_x0000_i1025"
 </v:shape><![endif]--><![if !vml]><img width=245 height=28
 src="ROC%20scale%20interp%2020191025.fld/image110.png" v:shapes="_x0000_i1025"><![endif]></span><![endif]></p>
 
+<<<<<<< Updated upstream
 <p >1-Y is not directly proportional to 1-Prev.</p>
 
 <h1><span style='mso-fareast-language:JA'>F1 score 20200213<o:p></o:p></span></h1>
@@ -4052,3 +4053,6 @@ style='mso-fareast-language:JA'><o:p></o:p></span></p>
    style='mso-bidi-font-style:normal'><span style='font-family:"Cambria Math",serif;
    mso-fareast-language:JA'><m:r>1-</m:r><m:r>Sens</m:r></span></i></m:den></m:f></m:oMath><![endif]--><![if !msEquation]><span
 style='font-size:11.0pt;font-family:"Calibri",sans-serif;mso-asc
+=======
+<p >1-Y is not directly proportional to 1-Prev.</p>
+>>>>>>> Stashed changes
